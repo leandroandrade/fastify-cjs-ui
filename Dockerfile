@@ -1,4 +1,4 @@
-FROM node:24.13.0-bullseye-slim AS build
+FROM node:25.6.0-bullseye-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
@@ -7,7 +7,7 @@ COPY ./templates /usr/src/app/templates
 RUN npx @tailwindcss/cli -i ./templates/css/custom.css -o ./public/css/styles.css --minify
 RUN npm prune --production
 
-FROM node:24.13.0-bullseye-slim
+FROM node:25.6.0-bullseye-slim
 COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
 USER node
 WORKDIR /usr/src/app
