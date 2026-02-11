@@ -1,4 +1,4 @@
-# fastify-cjs
+# fastify-cjs-ui
 
 Modern REST API template using Fastify with CommonJS, featuring built-in web UI support with EJS templates, TailwindCSS, and Alpine.js.
 
@@ -91,7 +91,7 @@ http://localhost:3000/docs
 
 Command to build docker image:
 ```shell
-docker build -t leandromandrade/fastify-cjs .
+docker build -t leandromandrade/fastify-cjs-ui .
 ```
 
 ## Production

@@ -1,5 +1,5 @@
 {
-  "name": "fastify-cjs",
+  "name": "fastify-cjs-ui",
   "version": "1.2.0",
   "description": "",
   "main": "src/server.js",
@@ -23,14 +23,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leandroandrade/fastify-cjs.git"
+    "url": "git+https://github.com/leandroandrade/fastify-cjs-ui.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leandroandrade/fastify-cjs/issues"
+    "url": "https://github.com/leandroandrade/fastify-cjs-ui/issues"
   },
-  "homepage": "https://github.com/leandroandrade/fastify-cjs#readme",
+  "homepage": "https://github.com/leandroandrade/fastify-cjs-ui#readme",
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
     "@fastify/cookie": "^11.0.2",
