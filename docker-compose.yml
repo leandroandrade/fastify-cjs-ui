@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    container_name: fastify-cjs
+    ports:
+      - '8080:8080'
+    environment:
+      PORT: 8080
+
+networks:
+  default:
+    driver: bridge

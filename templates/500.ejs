@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/x-icon" href="/public/assets/favicon.ico">
+
+  <title>Fastify CJS | Erro interno</title>
+
+  <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+  <main class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+    <a href="/" class="mb-8">
+      <svg class="h-12 w-12 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2L3 14h9l-1 8l10-12h-9l1-8z"/>
+      </svg>
+    </a>
+
+    <h1 class="text-8xl lg:text-9xl font-bold text-primary mb-6">500</h1>
+
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      Erro interno do servidor
+    </h2>
+
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-10 max-w-2xl text-center">
+      Desculpe, houve um erro ao processar sua requisição. Tente novamente mais tarde.
+    </p>
+
+    <a href="/"
+       class="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-base font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition-all shadow-lg hover:shadow-xl">
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
+        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
+        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
+      </svg>
+      Ir para a página inicial
+    </a>
+  </main>
+
+  <footer class="py-6 text-center">
+    <p class="text-sm text-gray-500 dark:text-gray-500" x-data>
+      Fastify CJS © <span x-text="new Date().getFullYear()"></span> - REST API Template
+    </p>
+  </footer>
+
+<script src="/public/js/alpine.min.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@source "../";
+
+@theme {
+  --color-primary-light: #92d8fc;
+  --color-primary: #6399f1;
+  --color-primary-dark: #2e56e2;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}

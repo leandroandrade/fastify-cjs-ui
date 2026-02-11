@@ -1,0 +1,125 @@
+openapi: 3.0.1
+info:
+  title: Sample API
+  description: Sample API description.
+  version: 1.0.0
+  contact:
+    name: Leandro Andrade
+    email: leandro.andrade2588@gmail.com
+servers:
+  - url: http://localhost:3000/api
+    description: Localhost
+tags:
+  - name: Sample
+    description: Sample Services
+
+paths:
+  /sample:
+    get:
+      tags:
+        - Sample
+      summary: Sample Summary
+      description: Sample description.
+      responses:
+        200:
+          $ref: '#/components/responses/Sample'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Sample
+      summary: Sample Summary
+      description: Sample description.
+      requestBody:
+        $ref: '#/components/requestBodies/Sample'
+      responses:
+        201:
+          $ref: '#/components/responses/Sample'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: http code.
+          example: 400
+        error:
+          type: string
+          description: http error.
+          example: Bad Request
+        message:
+          type: string
+          description: message detail.
+          example: the information should be send.
+  responses:
+    Sample:
+      description: Sample
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              key:
+                type: integer
+                description: Sample key.
+                example: 1
+              value:
+                type: string
+                description: Sample value.
+                example: 'Sample'
+    BadRequest:
+      description: BadRequest
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: InternalServerError
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  requestBodies:
+    Sample:
+      description: Sample Payload
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              key:
+                type: integer
+                description: Sample key.
+                example: 1
+              value:
+                type: string
+                description: Sample value.
+                example: Sample
+            required:
+              - key
+              - value
