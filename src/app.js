@@ -2,12 +2,12 @@ const autoLoad = require('@fastify/autoload');
 const { join } = require('path');
 const Fastify = require('fastify');
 
-const defaultConfigs = require('./configs');
+const createConfigs = require('./configs');
 
 async function createApp(customConfigs = {}) {
+  const defaultConfigs = createConfigs();
   const app = Fastify({
     ...defaultConfigs,
-    routerOptions: { ...defaultConfigs.routerOptions },
     ...customConfigs
   });
 
