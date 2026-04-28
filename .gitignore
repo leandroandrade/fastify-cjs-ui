@@ -141,3 +141,6 @@ test-report.xml
 ztest
 
 package-lock.json
+
+.claude
+CLAUDE.md
