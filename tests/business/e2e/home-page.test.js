@@ -147,10 +147,10 @@ test('[e2e] demo de notificacoes deve estar presente', async (t) => {
     const isDemoTitleVisible = await demoTitle.isVisible();
     t.assert.ok(isDemoTitleVisible, 'Título da demo de notificações deve estar visível');
 
-    const successButton = page.locator('button:has-text("Success")');
-    const errorButton = page.locator('button:has-text("Error")');
-    const warningButton = page.locator('button:has-text("Warning")');
-    const infoButton = page.locator('button:has-text("Info")');
+    const successButton = page.locator('button:text-is("Success")');
+    const errorButton = page.locator('button:text-is("Error")');
+    const warningButton = page.locator('button:text-is("Warning")');
+    const infoButton = page.locator('button:text-is("Info")');
 
     t.assert.ok(await successButton.isVisible(), 'Botão Success deve estar visível');
     t.assert.ok(await errorButton.isVisible(), 'Botão Error deve estar visível');

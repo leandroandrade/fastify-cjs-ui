@@ -86,7 +86,7 @@ test('[e2e] notificacao de erro deve aparecer ao clicar no botao Error', async (
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
 
-    const errorButton = page.locator('button:has-text("Error")');
+    const errorButton = page.locator('button:text-is("Error")');
     await errorButton.click();
 
     const notificationElement = page.locator('#notification-alert');

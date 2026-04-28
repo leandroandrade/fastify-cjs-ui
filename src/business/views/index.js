@@ -9,6 +9,14 @@ async function viewsPlugin(app) {
     }, { layout: 'layout' });
   });
 
+  app.get('/error/404', (req, reply) => {
+    return reply.code(404).view('404.ejs');
+  });
+
+  app.get('/error/500', (req, reply) => {
+    return reply.code(500).view('500.ejs');
+  });
+
   return app;
 }
 
