@@ -30,51 +30,12 @@ document.addEventListener('alpine:init', () => {
   window.showWarning = (message, duration = 6000) => window.showNotification(message, 'warning', duration);
   window.showInfo = (message, duration = 6000) => window.showNotification(message, 'info', duration);
 
+  // Forwarders no escopo principal — encaminham para o stack via evento global,
+  // permitindo `@click="showSuccess(...)"` em qualquer template sob `x-data="main()"`.
   Alpine.data('main', () => ({
-    notification: {
-      show: false,
-      message: '',
-      type: 'success'
-    },
-
-    init() {
-      // Escutar eventos globais
-      window.addEventListener('show-notification', (event) => {
-        const { message, type, duration } = event.detail;
-        this.showNotification(message, type, duration);
-      });
-    },
-
-    showNotification(message, type = 'success', duration = 5000) {
-      this.notification.message = message;
-      this.notification.type = type;
-      this.notification.show = true;
-
-      if (duration > 0) {
-        setTimeout(() => {
-          this.hideNotification();
-        }, duration);
-      }
-    },
-
-    hideNotification() {
-      this.notification.show = false;
-    },
-
-    showSuccess(message, duration = 5000) {
-      this.showNotification(message, 'success', duration);
-    },
-
-    showError(message, duration = 7000) {
-      this.showNotification(message, 'danger', duration);
-    },
-
-    showWarning(message, duration = 6000) {
-      this.showNotification(message, 'warning', duration);
-    },
-
-    showInfo(message, duration = 6000) {
-      this.showNotification(message, 'info', duration);
-    }
+    showSuccess: (message, duration = 5000) => window.showSuccess(message, duration),
+    showError: (message, duration = 7000) => window.showError(message, duration),
+    showWarning: (message, duration = 6000) => window.showWarning(message, duration),
+    showInfo: (message, duration = 6000) => window.showInfo(message, duration)
   }));
 });

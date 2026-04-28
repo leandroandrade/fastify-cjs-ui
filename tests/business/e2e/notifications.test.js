@@ -62,8 +62,9 @@ test('[e2e] notificacao de sucesso deve aparecer ao clicar no botao Success', as
     const notificationText = await notificationElement.textContent();
     t.assert.ok(notificationText.includes('sucesso'), 'Notificação deve conter mensagem de sucesso');
 
-    const borderClass = await notificationElement.getAttribute('class');
-    t.assert.ok(borderClass.includes('border-green-600'), 'Notificação de sucesso deve ter borda verde');
+    const successIcon = notificationElement.locator('svg.text-green-600');
+    await successIcon.waitFor({ state: 'visible', timeout: 2000 });
+    t.assert.ok(await successIcon.isVisible(), 'Notificação de sucesso deve exibir ícone verde');
 
     const icons = notificationElement.locator('svg');
     const iconCount = await icons.count();
@@ -98,8 +99,9 @@ test('[e2e] notificacao de erro deve aparecer ao clicar no botao Error', async (
     const notificationText = await notificationElement.textContent();
     t.assert.ok(notificationText.includes('erro'), 'Notificação deve conter mensagem de erro');
 
-    const borderClass = await notificationElement.getAttribute('class');
-    t.assert.ok(borderClass.includes('border-red-600'), 'Notificação de erro deve ter borda vermelha');
+    const errorIcon = notificationElement.locator('svg.text-red-600');
+    await errorIcon.waitFor({ state: 'visible', timeout: 2000 });
+    t.assert.ok(await errorIcon.isVisible(), 'Notificação de erro deve exibir ícone vermelho');
   } finally {
     await browser.close();
     await fastify.close();
@@ -130,8 +132,9 @@ test('[e2e] notificacao de warning deve aparecer ao clicar no botao Warning', as
     const notificationText = await notificationElement.textContent();
     t.assert.ok(notificationText.includes('Atenção'), 'Notificação deve conter mensagem de atenção');
 
-    const borderClass = await notificationElement.getAttribute('class');
-    t.assert.ok(borderClass.includes('border-amber-600'), 'Notificação de warning deve ter borda âmbar');
+    const warningIcon = notificationElement.locator('svg.text-amber-600');
+    await warningIcon.waitFor({ state: 'visible', timeout: 2000 });
+    t.assert.ok(await warningIcon.isVisible(), 'Notificação de warning deve exibir ícone âmbar');
   } finally {
     await browser.close();
     await fastify.close();
@@ -162,8 +165,9 @@ test('[e2e] notificacao de info deve aparecer ao clicar no botao Info', async (t
     const notificationText = await notificationElement.textContent();
     t.assert.ok(notificationText.includes('Informação'), 'Notificação deve conter mensagem de informação');
 
-    const borderClass = await notificationElement.getAttribute('class');
-    t.assert.ok(borderClass.includes('border-blue-600'), 'Notificação de info deve ter borda azul');
+    const infoIcon = notificationElement.locator('svg.text-gray-600');
+    await infoIcon.waitFor({ state: 'visible', timeout: 2000 });
+    t.assert.ok(await infoIcon.isVisible(), 'Notificação de info deve exibir ícone neutro (gray-600)');
   } finally {
     await browser.close();
     await fastify.close();
