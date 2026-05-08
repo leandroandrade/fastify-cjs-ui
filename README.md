@@ -7,7 +7,9 @@ Modern REST API template using Fastify with CommonJS, featuring built-in web UI 
 - 🚀 **Fastify Framework**: Fast and low overhead web framework
 - 📄 **EJS Templates**: Server-side rendering with layout support
 - 🎨 **TailwindCSS v4**: Utility-first CSS framework with custom theme
+- 🧩 **Reusable CSS Components**: Pre-built `.btn-*`, `.card`, `.alert-*` classes
 - ⚡ **Alpine.js**: Lightweight reactive JavaScript framework
+- 🔔 **Toast Notifications**: Stacked notification system with `Alpine.notificadores()` factory
 - 📚 **Swagger Documentation**: Auto-generated API documentation
 - 🔧 **Error Handling**: Custom error pages (404, 500) for both views and API
 - 🎯 **Plugin Architecture**: Modular and maintainable code structure
@@ -165,7 +167,8 @@ All the API requests are available in the ```requests``` directory at the root p
 │   │   └── styles.css        # Compiled TailwindCSS
 │   ├── js
 │   │   ├── alpine.min.js     # Alpine.js library
-│   │   └── main.js           # Global Alpine.js setup
+│   │   ├── main.js           # Global Alpine setup (notifications + formatters)
+│   │   └── api-demo.js       # Example Alpine component (API integration)
 │   └── assets
 │       └── favicon.ico
 └── tests
@@ -207,6 +210,29 @@ Usage example:
 </button>
 ```
 
+### Reusable CSS Components
+
+Component classes are defined in `templates/css/custom.css` under `@layer components`. Use them to keep markup consistent across pages:
+
+| Class | Purpose |
+| --- | --- |
+| `.btn-primary` / `.btn-secondary` / `.btn-danger` / `.btn-icon` | Standard button variants with disabled/hover states |
+| `.card` | Surface container with border and dark mode |
+| `.card-stat` | Compact card variant (centered, padded) for metrics |
+| `.alert-info` / `.alert-success` / `.alert-warning` / `.alert-danger` | Inline alert boxes with semantic colors |
+
+Example:
+```html
+<div class="card p-6">
+  <h2 class="text-xl font-semibold">Title</h2>
+  <button class="btn-primary mt-4">Action</button>
+</div>
+
+<div class="alert-danger" role="alert">
+  <span>Something went wrong.</span>
+</div>
+```
+
 ### Alpine.js
 
 Reactive components for interactivity:
@@ -217,13 +243,50 @@ Reactive components for interactivity:
 </div>
 ```
 
-Global notification system:
+#### Notification System
+
+The layout renders a stack of toasts (multiple notifications can be displayed simultaneously, each with auto-dismiss and a manual close button). Trigger a notification by dispatching the `show-notification` event — the recommended way is the `Alpine.notificadores()` factory, which exposes the helpers ready to be spread into any Alpine component:
+
 ```javascript
-window.showSuccess('Operation successful!');
-window.showError('An error occurred!');
-window.showWarning('Warning message!');
-window.showInfo('Information message!');
+function meuComponente() {
+  return {
+    ...Alpine.notificadores(),
+
+    async salvar() {
+      try {
+        await fetch('/api/...', { method: 'POST' });
+        this.notificarSucesso('Registro salvo');
+      } catch (err) {
+        this.notificarErro('Falha ao salvar');
+      }
+    }
+  };
+}
 ```
+
+Available methods (all accept an optional `duracao` in ms):
+- `notificarSucesso(mensagem)`
+- `notificarErro(mensagem)`
+- `notificarAviso(mensagem)`
+- `notificarInfo(mensagem)`
+
+If you need to trigger a notification from outside an Alpine component, dispatch the underlying event directly:
+
+```javascript
+window.dispatchEvent(new CustomEvent('show-notification', {
+  detail: { message: 'Hello', type: 'success', duration: 5000 }
+}));
+```
+
+#### Formatters Store
+
+A shared `Alpine.store('formatters')` provides reusable formatting helpers. Use it via `$store.formatters` in templates:
+
+```html
+<span x-text="$store.formatters.formatarDataRelativa(item.criado_em)"></span>
+```
+
+Add new formatters to `public/js/main.js` to make them available across all pages.
 
 ### EJS Templates
 

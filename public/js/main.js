@@ -1,4 +1,3 @@
-// Aguardar Alpine.js carregar para conectar os eventos globais
 document.addEventListener('alpine:init', () => {
   Alpine.store('formatters', {
     formatarDataRelativa(isoString, agora = Date.now()) {
@@ -18,24 +17,22 @@ document.addEventListener('alpine:init', () => {
     }
   });
 
-  // Tornar o sistema disponível globalmente usando eventos
-  window.showNotification = function(message, type = 'success', duration = 5000) {
-    window.dispatchEvent(new CustomEvent('show-notification', {
-      detail: { message, type, duration }
-    }));
-  };
+  Alpine.notificadores = () => ({
+    notificarSucesso(mensagem, duracao = 5000) {
+      this.$dispatch('show-notification', { message: mensagem, type: 'success', duration: duracao });
+    },
+    notificarErro(mensagem, duracao = 7000) {
+      this.$dispatch('show-notification', { message: mensagem, type: 'danger', duration: duracao });
+    },
+    notificarAviso(mensagem, duracao = 6000) {
+      this.$dispatch('show-notification', { message: mensagem, type: 'warning', duration: duracao });
+    },
+    notificarInfo(mensagem, duracao = 6000) {
+      this.$dispatch('show-notification', { message: mensagem, type: 'info', duration: duracao });
+    }
+  });
 
-  window.showSuccess = (message, duration = 5000) => window.showNotification(message, 'success', duration);
-  window.showError = (message, duration = 7000) => window.showNotification(message, 'danger', duration);
-  window.showWarning = (message, duration = 6000) => window.showNotification(message, 'warning', duration);
-  window.showInfo = (message, duration = 6000) => window.showNotification(message, 'info', duration);
-
-  // Forwarders no escopo principal — encaminham para o stack via evento global,
-  // permitindo `@click="showSuccess(...)"` em qualquer template sob `x-data="main()"`.
   Alpine.data('main', () => ({
-    showSuccess: (message, duration = 5000) => window.showSuccess(message, duration),
-    showError: (message, duration = 7000) => window.showError(message, duration),
-    showWarning: (message, duration = 6000) => window.showWarning(message, duration),
-    showInfo: (message, duration = 6000) => window.showInfo(message, duration)
+    ...Alpine.notificadores()
   }));
 });

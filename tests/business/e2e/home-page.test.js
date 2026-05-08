@@ -58,7 +58,7 @@ test('[e2e] home page deve exibir os 6 cards de features', async (t) => {
     await page.goto('http://localhost:3001/');
     await page.waitForLoadState('networkidle');
 
-    const featureCards = page.locator('.grid > div.bg-white');
+    const featureCards = page.locator('.grid > div.card');
     const cardCount = await featureCards.count();
     t.assert.strictEqual(cardCount, 6, 'Deve haver 6 cards de features');
 

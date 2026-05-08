@@ -1,5 +1,7 @@
 function apiDemo() {
   return {
+    ...Alpine.notificadores(),
+
     loading: false,
     response: null,
     name: '',
@@ -18,9 +20,9 @@ function apiDemo() {
 
         this.response = data;
 
-        window.showSuccess(data.message);
+        this.notificarSucesso(data.message);
       } catch (error) {
-        window.showError('Erro ao buscar dados do servidor');
+        this.notificarErro('Erro ao buscar dados do servidor');
         console.error('Erro na requisição:', error);
       } finally {
         this.loading = false;
