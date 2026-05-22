@@ -1,4 +1,7 @@
-FROM node:24.13.0-bullseye-slim AS build
+FROM node:24.13.0-trixie-slim AS build
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends dumb-init \
+  && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr/src/app
 COPY package*.json /usr/src/app/
@@ -8,7 +11,15 @@ RUN npx @tailwindcss/cli -i ./templates/css/custom.css -o ./public/css/styles.cs
 RUN npm run js:build
 RUN npm prune --omit=dev
 
-FROM node:24.13.0-bullseye-slim
+FROM node:24.13.0-trixie-slim
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /usr/local/lib/node_modules/npm \
+       /usr/local/lib/node_modules/corepack \
+       /opt/yarn-v* \
+       /usr/local/bin/npm /usr/local/bin/npx \
+       /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg
 COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
 USER node
 WORKDIR /usr/src/app
