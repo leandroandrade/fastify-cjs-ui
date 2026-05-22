@@ -23,12 +23,6 @@ Installing dependencies:
 npm install
 ```
 
-Download Alpine.js:
-
-```shell
-npm run update:alpine
-```
-
 Configure environment file:
 
 ```shell
@@ -43,8 +37,9 @@ npm run dev
 
 The development server will:
 1. Build TailwindCSS automatically
-2. Start the server with hot-reload enabled
-3. Watch for file changes in `./src`
+2. Copy the Alpine.js assets from `node_modules` to `public/js`
+3. Start the server with hot-reload enabled
+4. Watch for file changes in `./src`
 
 ## Available Scripts
 
@@ -58,9 +53,7 @@ npm run test:coverage # Run tests with coverage report
 npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint errors automatically
 npm run css:build    # Build TailwindCSS (production)
-npm run css:watch    # Watch and rebuild TailwindCSS on changes
-npm run update:alpine # Download latest Alpine.js v3.x
-npm run update:deps  # Update all UI dependencies
+npm run js:build     # Copy Alpine.js assets from node_modules to public/js
 ```
 
 ## Testing

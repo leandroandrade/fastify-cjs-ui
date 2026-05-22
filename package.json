@@ -9,13 +9,12 @@
     "test:single": "node --env-file=.env.test --test --test-concurrency=1",
     "test:coverage": "c8 --reporter=text --reporter=lcov node --env-file=.env.test --test --test-concurrency=1 './tests/**/*.test.js'",
     "test:report": "c8 --reporter=html node --env-file=.env.test --test --test-concurrency=1 './tests/**/*.test.js'",
-    "dev": "npm run css:build && node --env-file=.env --watch-path=./src src/server.js",
+    "dev": "npm run css:build && npm run js:build && node --env-file=.env --watch-path=./src src/server.js",
     "start": "node src/server.js",
     "lint": "eslint",
     "lint:fix": "npm run lint -- --fix",
     "css:build": "tailwindcss -i ./templates/css/custom.css -o ./public/css/styles.css --minify",
-    "css:watch": "tailwindcss -i ./templates/css/custom.css -o ./public/css/styles.css --watch",
-    "update:alpine": "curl -L \"https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js\" -o public/js/alpine.min.js",
+    "js:build": "mkdir -p public/js && cp node_modules/alpinejs/dist/cdn.min.js public/js/alpine.min.js",
     "update:deps": "npm run update:alpine"
   },
   "engines": {
@@ -49,6 +48,7 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.18",
+    "alpinejs": "^3.15.12",
     "c8": "^10.1.3",
     "eslint": "^9.33.0",
     "neostandard": "^0.12.2",

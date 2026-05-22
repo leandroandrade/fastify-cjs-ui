@@ -5,7 +5,8 @@ COPY package*.json /usr/src/app/
 RUN npm ci
 COPY ./templates /usr/src/app/templates
 RUN npx @tailwindcss/cli -i ./templates/css/custom.css -o ./public/css/styles.css --minify
-RUN npm prune --production
+RUN npm run js:build
+RUN npm prune --omit=dev
 
 FROM node:24.13.0-bullseye-slim
 COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
@@ -16,6 +17,7 @@ COPY --chown=node:node ./src /usr/src/app/src
 COPY --chown=node:node ./templates /usr/src/app/templates
 COPY --chown=node:node ./public /usr/src/app/public
 COPY --chown=node:node --from=build /usr/src/app/public/css/styles.css /usr/src/app/public/css/styles.css
+COPY --chown=node:node --from=build /usr/src/app/public/js /usr/src/app/public/js
 
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}

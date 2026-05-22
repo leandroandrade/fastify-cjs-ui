@@ -63,6 +63,7 @@ test('[e2e] notificacao de sucesso deve aparecer ao clicar no botao Success', as
     t.assert.ok(notificationText.includes('sucesso'), 'Notificação deve conter mensagem de sucesso');
 
     const successIcon = notificationElement.locator('svg.text-green-600').first();
+    await successIcon.waitFor({ state: 'visible', timeout: 3000 });
     t.assert.ok(await successIcon.isVisible(), 'Notificação de sucesso deve ter ícone verde');
 
     const icons = notificationElement.locator('svg');
@@ -99,6 +100,7 @@ test('[e2e] notificacao de erro deve aparecer ao clicar no botao Error', async (
     t.assert.ok(notificationText.includes('erro'), 'Notificação deve conter mensagem de erro');
 
     const errorIcon = notificationElement.locator('svg.text-red-600').first();
+    await errorIcon.waitFor({ state: 'visible', timeout: 3000 });
     t.assert.ok(await errorIcon.isVisible(), 'Notificação de erro deve ter ícone vermelho');
   } finally {
     await browser.close();
@@ -131,6 +133,7 @@ test('[e2e] notificacao de warning deve aparecer ao clicar no botao Warning', as
     t.assert.ok(notificationText.includes('Atenção'), 'Notificação deve conter mensagem de atenção');
 
     const warningIcon = notificationElement.locator('svg.text-amber-600').first();
+    await warningIcon.waitFor({ state: 'visible', timeout: 3000 });
     t.assert.ok(await warningIcon.isVisible(), 'Notificação de warning deve ter ícone âmbar');
   } finally {
     await browser.close();
@@ -163,6 +166,7 @@ test('[e2e] notificacao de info deve aparecer ao clicar no botao Info', async (t
     t.assert.ok(notificationText.includes('Informação'), 'Notificação deve conter mensagem de informação');
 
     const infoIcon = notificationElement.locator('svg.text-blue-600').first();
+    await infoIcon.waitFor({ state: 'visible', timeout: 3000 });
     t.assert.ok(await infoIcon.isVisible(), 'Notificação de info deve ter ícone azul');
   } finally {
     await browser.close();
