@@ -1,12 +1,8 @@
 const fp = require('fastify-plugin');
 
-function isApiRequest(req) {
-  return req.url.startsWith('/api/');
-}
-
 async function notfoundPlugin(fastify) {
   fastify.setNotFoundHandler((req, reply) => {
-    if (isApiRequest(req)) {
+    if (fastify.isApiRequest(req)) {
       return fastify.httpErrors.notFound('Sorry, we could not find what you were looking for.');
     }
 
@@ -19,5 +15,6 @@ async function notfoundPlugin(fastify) {
 }
 
 module.exports = fp(notfoundPlugin, {
-  dependencies: ['env', 'view']
+  name: 'not-found',
+  dependencies: ['env', 'view', 'api-request']
 });

@@ -4,15 +4,7 @@ const createError = require('@fastify/error');
 const SecFetchValidationError = createError('SEC_FETCH_VALIDATION_ERROR', '%s', 403);
 
 async function secFetchValidationPlugin(fastify) {
-  const parseOrigins = (value = '') =>
-    value
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean);
-
-  const allowedOrigins = new Set([
-    ...parseOrigins(fastify.config.CORS_ORIGIN)
-  ]);
+  const allowedOrigins = fastify.allowedOrigins;
 
   const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS', 'TRACE'];
 
@@ -52,6 +44,9 @@ async function secFetchValidationPlugin(fastify) {
    * none: A requisição foi iniciada diretamente pelo usuário (digitando URL, bookmark, etc.)
    */
   fastify.decorate('secFetchSiteProtection', (req, reply, done) => {
+    if (!fastify.isApiRequest(req)) {
+      return done();
+    }
     if (SAFE_METHODS.includes(req.method)) {
       return done();
     }
@@ -69,20 +64,20 @@ async function secFetchValidationPlugin(fastify) {
         return done();
       }
 
-      fastify.log.error({ origin: originValue, secFetchSite, requestHost }, 'Cross-site requests not allowed');
+      fastify.log.error({ origin: originValue, secFetchSite, requestHost }, 'sec-fetch-validation: cross-site requests not allowed');
       return done(new SecFetchValidationError('Cross-site requests not allowed'));
     }
 
     // Para same-site/none/ausente/desconhecido => exige Origin/Referer (evita bypass)
     const originValue = originFromHeaders(req);
     if (!originValue) {
-      fastify.log.error({ secFetchSite, requestHost }, 'Missing Origin/Referer');
+      fastify.log.error({ secFetchSite, requestHost }, 'sec-fetch-validation: missing Origin/Referer');
       return done(new SecFetchValidationError('Missing Origin/Referer'));
     }
 
     const originUrl = parseOrigin(originValue);
     if (!originUrl) {
-      fastify.log.error({ origin: originValue, secFetchSite, requestHost }, 'Invalid Origin/Referer');
+      fastify.log.error({ origin: originValue, secFetchSite, requestHost }, 'sec-fetch-validation: invalid Origin/Referer');
       return done(new SecFetchValidationError('Invalid Origin/Referer'));
     }
 
@@ -95,11 +90,14 @@ async function secFetchValidationPlugin(fastify) {
       return done();
     }
 
-    fastify.log.error({ origin: originUrl.origin, originHost, secFetchSite, requestHost }, 'Request origin not allowed');
+    fastify.log.error({ origin: originUrl.origin, originHost, secFetchSite, requestHost }, 'sec-fetch-validation: request origin not allowed');
     return done(new SecFetchValidationError('Request origin not allowed'));
   });
+
+  fastify.addHook('onRequest', fastify.secFetchSiteProtection);
 }
 
 module.exports = fp(secFetchValidationPlugin, {
-  dependencies: ['env']
+  name: 'sec-fetch-validation',
+  dependencies: ['env', 'api-request']
 });

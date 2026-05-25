@@ -2,13 +2,15 @@ const Fastify = require('fastify');
 const { test } = require('node:test');
 
 const sensiblePlugin = require('../../../src/core/plugins/sensible');
+const apiRequestPlugin = require('../../../src/core/plugins/api-request');
 const errorHandler = require('../../../src/core/plugins/error-handler');
 
-test('[core] should format date with locale string', async (t) => {
+test('[core] schema validation errors return generic message', async (t) => {
   const fastify = Fastify();
   t.after(async () => { await fastify.close(); });
 
   await fastify.register(sensiblePlugin);
+  await fastify.register(apiRequestPlugin);
   await fastify.register(errorHandler);
 
   const schema = {
@@ -32,18 +34,19 @@ test('[core] should format date with locale string', async (t) => {
   });
 
   t.assert.strictEqual(response.statusCode, 400);
-  t.assert.deepStrictEqual(response.json(), {
-    statusCode: 400,
-    error: 'Bad Request',
-    message: 'params/message must NOT have more than 2 characters'
-  });
+  const body = response.json();
+  t.assert.strictEqual(body.statusCode, 400);
+  t.assert.strictEqual(body.error, 'Bad Request');
+  t.assert.strictEqual(body.message, 'Dados de entrada inválidos.');
+  t.assert.strictEqual(body.code, 'FST_ERR_VALIDATION');
 });
 
-test('should return generic error', async t => {
+test('should return generic error for untyped 5xx', async t => {
   const fastify = Fastify();
   t.after(async () => { await fastify.close(); });
 
   await fastify.register(sensiblePlugin);
+  await fastify.register(apiRequestPlugin);
   await fastify.register(errorHandler);
 
   fastify.get('/api/test', (request, reply) => {
@@ -60,7 +63,7 @@ test('should return generic error', async t => {
   });
 });
 
-test('should return custom error', async t => {
+test('untyped 4xx returns generic message (info-leak protection)', async t => {
   class SomeError extends Error {
     constructor(message, statusCode) {
       super(message);
@@ -73,6 +76,7 @@ test('should return custom error', async t => {
   t.after(async () => { await fastify.close(); });
 
   await fastify.register(sensiblePlugin);
+  await fastify.register(apiRequestPlugin);
   await fastify.register(errorHandler);
 
   fastify.get('/api/test', (request, reply) => {
@@ -85,6 +89,27 @@ test('should return custom error', async t => {
   t.assert.deepStrictEqual(response.json(), {
     statusCode: 422,
     error: 'Unprocessable Entity',
-    message: 'Custom Error!'
+    message: 'Requisição inválida.'
   });
+});
+
+test('typed 4xx (httpErrors) passes through message', async t => {
+  const fastify = Fastify();
+  t.after(async () => { await fastify.close(); });
+
+  await fastify.register(sensiblePlugin);
+  await fastify.register(apiRequestPlugin);
+  await fastify.register(errorHandler);
+
+  fastify.get('/api/test', (request, reply) => {
+    return fastify.httpErrors.unprocessableEntity('Custom Error!');
+  });
+
+  const response = await fastify.inject('/api/test');
+  t.assert.strictEqual(response.statusCode, 422);
+
+  const body = response.json();
+  t.assert.strictEqual(body.statusCode, 422);
+  t.assert.strictEqual(body.error, 'Unprocessable Entity');
+  t.assert.strictEqual(body.message, 'Custom Error!');
 });

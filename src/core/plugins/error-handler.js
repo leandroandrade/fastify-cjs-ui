@@ -1,43 +1,7 @@
+const { STATUS_CODES } = require('node:http');
 const fp = require('fastify-plugin');
 
-function isApiRequest(req) {
-  return req.url.startsWith('/api/');
-}
-
-async function errorHandlerPlugin(fastify, opts) {
-
-  const httpErrorNames = {
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    402: 'Payment Required',
-    403: 'Forbidden',
-    404: 'Not Found',
-    405: 'Method Not Allowed',
-    406: 'Not Acceptable',
-    407: 'Proxy Authentication Required',
-    408: 'Request Timeout',
-    409: 'Conflict',
-    410: 'Gone',
-    411: 'Length Required',
-    412: 'Precondition Failed',
-    413: 'Payload Too Large',
-    414: 'URI Too Long',
-    415: 'Unsupported Media Type',
-    416: 'Range Not Satisfiable',
-    417: 'Expectation Failed',
-    418: "I'm a teapot",
-    421: 'Misdirected Request',
-    422: 'Unprocessable Entity',
-    423: 'Locked',
-    424: 'Failed Dependency',
-    425: 'Too Early',
-    426: 'Upgrade Required',
-    428: 'Precondition Required',
-    429: 'Too Many Requests',
-    431: 'Request Header Fields Too Large',
-    451: 'Unavailable For Legal Reasons'
-  };
-
+async function errorHandlerPlugin(fastify) {
   fastify.setErrorHandler((err, req, reply) => {
     const statusCode = err.statusCode || 500;
 
@@ -48,31 +12,70 @@ async function errorHandlerPlugin(fastify, opts) {
     }
 
     if (statusCode >= 400 && statusCode <= 499) {
-      return reply.code(statusCode).send({
+      // Erros de validação de JSON Schema vêm com `err.validation` (array AJV).
+      // A mensagem crua pode expor nomes de campos internos; substituímos por
+      // uma mensagem genérica e mantemos o detalhe no log.
+      const isErroValidacaoSchema = Array.isArray(err?.validation);
+      // Para os demais 4xx, repassa a mensagem só quando vem de fontes tipadas:
+      // - @fastify/error: seta `err.code`
+      // - httpErrors (http-errors): seta `err.expose === true`
+      const isErroTipado = err?.expose === true || (typeof err?.code === 'string' && err.code.length > 0);
+
+      let mensagemSegura;
+      if (isErroValidacaoSchema) {
+        mensagemSegura = 'Dados de entrada inválidos.';
+      } else if (isErroTipado) {
+        mensagemSegura = err.message;
+      } else {
+        mensagemSegura = 'Requisição inválida.';
+      }
+
+      const payload = {
         statusCode,
-        error: httpErrorNames[statusCode] || 'Bad Request',
-        message: err?.message || 'Erro de validação!'
-      });
+        error: STATUS_CODES[statusCode] || 'Bad Request',
+        message: mensagemSegura
+      };
+      if (typeof err?.code === 'string' && err.code.length > 0) {
+        payload.code = err.code;
+      }
+
+      return reply.code(statusCode).send(payload);
     }
 
-    if (isApiRequest(req)) {
-      return reply.code(500).send({
-        statusCode: 500,
-        error: 'Internal Server Error',
-        message: 'Sorry, there was an error processing your request.'
-      });
+    // Erros 5xx tipados via @fastify/error (ou httpErrors) carregam mensagem
+    // intencional e segura; repassamos para o cliente. Erros não tipados
+    // (TypeError, falhas de runtime) seguem squashados para mensagem genérica.
+    const isErroTipado5xx = err?.expose === true || (typeof err?.code === 'string' && err.code.length > 0);
+
+    if (fastify.isApiRequest(req)) {
+      const mensagem = isErroTipado5xx ? err.message : 'Sorry, there was an error processing your request.';
+      const codigo = isErroTipado5xx ? err.code : undefined;
+
+      const payload = {
+        statusCode,
+        error: STATUS_CODES[statusCode] || 'Internal Server Error',
+        message: mensagem
+      };
+      if (codigo) {
+        payload.code = codigo;
+      }
+
+      return reply.code(statusCode).send(payload);
     }
 
     if (typeof reply.view === 'function') {
-      return reply.status(500).view('500.ejs');
+      return reply.status(statusCode).view('500.ejs');
     }
 
-    return reply.code(500).send({
-      statusCode: 500,
-      error: 'Internal Server Error',
+    return reply.code(statusCode).send({
+      statusCode,
+      error: STATUS_CODES[statusCode] || 'Internal Server Error',
       message: 'Sorry, there was an error processing your request.'
     });
   });
 }
 
-module.exports = fp(errorHandlerPlugin);
+module.exports = fp(errorHandlerPlugin, {
+  name: 'error-handler',
+  dependencies: ['api-request']
+});

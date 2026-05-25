@@ -9,8 +9,8 @@ async function createTestApp() {
     reply.send({ ok: true });
   };
 
-  fastify.get('/test-route', { preHandler }, handler);
-  fastify.post('/test-route', { preHandler }, handler);
+  fastify.get('/api/test-route', { preHandler }, handler);
+  fastify.post('/api/test-route', { preHandler }, handler);
 
   return fastify;
 }
@@ -22,13 +22,13 @@ describe('sec-fetch-validation plugin', () => {
 
     const getResponse = await fastify.inject({
       method: 'GET',
-      url: '/test-route'
+      url: '/api/test-route'
     });
     t.assert.strictEqual(getResponse.statusCode, 200);
 
     const headResponse = await fastify.inject({
       method: 'HEAD',
-      url: '/test-route'
+      url: '/api/test-route'
     });
     t.assert.strictEqual(headResponse.statusCode, 200);
   });
@@ -39,7 +39,7 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'same-origin',
         'content-type': 'application/json'
@@ -56,7 +56,7 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'same-site',
         'content-type': 'application/json'
@@ -73,10 +73,10 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'cross-site',
-        'origin': 'http://localhost:3000',
+        origin: 'http://localhost:3000',
         'content-type': 'application/json'
       },
       body: {}
@@ -91,10 +91,10 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'cross-site',
-        'origin': 'http://evil.com',
+        origin: 'http://evil.com',
         'content-type': 'application/json'
       },
       body: {}
@@ -109,7 +109,7 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'cross-site',
         'content-type': 'application/json'
@@ -126,9 +126,9 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
-        'origin': 'http://localhost',
+        origin: 'http://localhost',
         'content-type': 'application/json'
       },
       body: {}
@@ -143,7 +143,7 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'content-type': 'application/json'
       },
@@ -159,9 +159,9 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
-        'referer': 'http://localhost/some-path',
+        referer: 'http://localhost/some-path',
         'content-type': 'application/json'
       },
       body: {}
@@ -176,9 +176,9 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
-        'origin': 'not-a-url',
+        origin: 'not-a-url',
         'content-type': 'application/json'
       },
       body: {}
@@ -193,9 +193,9 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
-        'origin': 'http://evil.com',
+        origin: 'http://evil.com',
         'content-type': 'application/json'
       },
       body: {}
@@ -210,10 +210,10 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'none',
-        'origin': 'http://localhost:3000',
+        origin: 'http://localhost:3000',
         'content-type': 'application/json'
       },
       body: {}
@@ -228,10 +228,10 @@ describe('sec-fetch-validation plugin', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/test-route',
+      url: '/api/test-route',
       headers: {
         'sec-fetch-site': 'cross-site',
-        'origin': 'http://evil.com',
+        origin: 'http://evil.com',
         'content-type': 'application/json'
       },
       body: {}
