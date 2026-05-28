@@ -36,12 +36,23 @@ async function secFetchValidationPlugin(fastify) {
   }
 
   /**
-   * Valores para o Sec-Fetch-Site:
+   * Proteção CSRF baseada nos headers Sec-Fetch.
    *
-   * same-origin: A requisição vem da mesma origem (mesmo protocolo, domínio e porta)
-   * same-site: A requisição vem do mesmo site (mas pode ser subdomínio diferente)
-   * cross-site: A requisição vem de um site completamente diferente
-   * none: A requisição foi iniciada diretamente pelo usuário (digitando URL, bookmark, etc.)
+   * Este decorator também é registrado como hook global `onRequest`. Ele só atua
+   * em `/api/*` (`fastify.isApiRequest(req)`); fora desse prefixo é no-op por
+   * desenho. Portanto, toda rota que altera estado deve viver sob `/api/*`.
+   *
+   * Métodos seguros (`GET`, `HEAD`, `OPTIONS`, `TRACE`) sempre passam. Para
+   * métodos mutadores:
+   * - `same-origin` e `same-site`: permitido.
+   * - `cross-site`: permitido apenas se `Origin` ou `Referer` estiver em
+   *   `allowedOrigins` (derivado de `CORS_ORIGIN`).
+   * - `none`, ausente ou desconhecido: exige `Origin` ou `Referer`; passa se a
+   *   origem bater com o host da requisição ou estiver em `allowedOrigins`.
+   *
+   * O hook roda em `onRequest` para bloquear antes de body parsing e validação de
+   * schema. Não use este decorator como `preHandler` em rotas `/api/*`, porque o
+   * hook global já cobre esse escopo.
    */
   fastify.decorate('secFetchSiteProtection', (req, reply, done) => {
     if (!fastify.isApiRequest(req)) {

@@ -4,13 +4,12 @@ const { buildApp } = require('../../shared/helper');
 async function createTestApp() {
   const fastify = await buildApp();
 
-  const preHandler = [fastify.secFetchSiteProtection];
   const handler = (req, reply) => {
     reply.send({ ok: true });
   };
 
-  fastify.get('/api/test-route', { preHandler }, handler);
-  fastify.post('/api/test-route', { preHandler }, handler);
+  fastify.get('/api/test-route', handler);
+  fastify.post('/api/test-route', handler);
 
   return fastify;
 }
@@ -243,5 +242,46 @@ describe('sec-fetch-validation plugin', () => {
     t.assert.strictEqual(body.statusCode, 403);
     t.assert.strictEqual(body.error, 'Forbidden');
     t.assert.ok(body.message);
+  });
+
+  test('global hook protects /api/* without per-route preHandler', async (t) => {
+    const fastify = await createTestApp();
+    t.after(async () => { await fastify.close(); });
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/test-route',
+      headers: {
+        'sec-fetch-site': 'cross-site',
+        origin: 'http://evil.com',
+        'content-type': 'application/json'
+      },
+      body: {}
+    });
+
+    t.assert.strictEqual(response.statusCode, 403);
+    t.assert.strictEqual(response.json().error, 'Forbidden');
+  });
+
+  test('hook não valida rotas fora de /api/* — POST cross-site passa', async (t) => {
+    const fastify = await buildApp();
+    t.after(async () => { await fastify.close(); });
+
+    fastify.post('/fora-da-api', (req, reply) => {
+      return reply.send({ ok: true });
+    });
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/fora-da-api',
+      headers: {
+        'sec-fetch-site': 'cross-site',
+        origin: 'http://evil.com',
+        'content-type': 'application/json'
+      },
+      body: {}
+    });
+
+    t.assert.strictEqual(response.statusCode, 200);
   });
 });
